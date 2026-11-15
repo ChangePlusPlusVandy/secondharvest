@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f8faf9;
+  color: #172b25;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: #c6e8d5;
+}
+
+:focus-visible {
+  outline: 3px solid #157446;
+  outline-offset: 4px;
+}

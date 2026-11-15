@@ -1,0 +1,145 @@
+[
+  {
+    "key": "scope",
+    "title": "[P0] Agree the SOP and policy library MVP with the client",
+    "depends_on_keys": [],
+    "body": "## Goal\nConfirm the first release of the centralized SOP and policy library before implementing client-specific behavior.\n\n## Scope\nThe MOU calls for current procedures and related resources, organized by department or functional area, with searchable access. This milestone covers that library only. Inspections, training tracking, corrective actions, recurring tasks, and dashboards belong to later milestones.\n\n## Acceptance criteria\n- [ ] Record the pilot departments, document types, sample documents, and who owns each department's content.\n- [ ] Agree who may read, create, update, publish, or archive documents. Map the client's roles to the library permissions.\n- [ ] Agree whether documents are uploaded files, external links, or both; identify the initial permitted file formats and upload size limit.\n- [ ] Define whether MVP search covers titles/descriptions/tags or document contents. Treat PDF/Word text extraction as additional work unless explicitly included.\n- [ ] Confirm the minimum document fields and what makes a version current; agree whether an approval step is required. Version history and a publishing workflow are proposed implementation choices, not assumed final requirements.\n- [ ] Record pilot acceptance scenarios and identify the client reviewer who can accept the result.\n- [ ] Save the agreed scope and open decisions in the repository without confidential documents or personal data.\n\n## Priority\nP0 — blocks client-specific implementation.",
+    "issue_number": 1,
+    "url": "https://github.com/ChangePlusPlusVandy/secondharvest/issues/1"
+  },
+  {
+    "key": "bootstrap",
+    "title": "[P0] Complete developer setup and validate the starter CI workflow",
+    "depends_on_keys": [],
+    "body": "## Goal\nGive every contributor a reproducible local setup and a reliable check before merging.\n\n## Scope\nThe starter PR provides the Next.js App Router, TypeScript, Tailwind, Vitest, sample-data library screens, and a repository boundary. It is boilerplate, not a connected production library. This ticket covers adoption and verification of that scaffold.\n\n## Acceptance criteria\n- [ ] Merge or otherwise agree the starter PR as the team's baseline.\n- [ ] Verify a fresh checkout can install dependencies with the committed lockfile and run the documented development command.\n- [ ] Verify lint, type checks, meaningful existing tests, and the production build run in CI on pull requests.\n- [ ] Document the supported Node version, environment setup, directory structure, and normal branch/PR workflow.\n- [ ] Confirm a second contributor can follow the README without undocumented setup steps.\n- [ ] Agree the review/merge process and configure repository checks if the maintainers choose to require them.\n\n## Priority\nP0 — foundation for all implementation tickets.",
+    "issue_number": 2,
+    "url": "https://github.com/ChangePlusPlusVandy/secondharvest/issues/2"
+  },
+  {
+    "key": "supabase",
+    "title": "[P0] Provision development Supabase and document environment configuration",
+    "depends_on_keys": [
+      "scope",
+      "bootstrap"
+    ],
+    "body": "## Goal\nPrepare an organization-controlled backend for the library.\n\n## Scope\nProvision a development environment and decide the production ownership model. Use synthetic or de-identified fixtures for development. Obtain the client's written approval before incurring a new recurring cost on its behalf.\n\n## Acceptance criteria\n- [ ] Confirm project ownership, authorized maintainers, region, and the separation between development and production.\n- [ ] Create/configure the development Supabase project and document how contributors obtain approved access.\n- [ ] Add the required variable names to the example environment file without credentials.\n- [ ] Store local and hosted credentials through the approved environment/secrets mechanism; keep privileged keys server-only.\n- [ ] Verify the application can connect to the development backend using the intended client/server boundary.\n- [ ] Document how to reset the development backend and what steps production provisioning will require.\n\n## Priority\nP0 — backend foundation.",
+    "issue_number": 3,
+    "url": "https://github.com/ChangePlusPlusVandy/secondharvest/issues/3"
+  },
+  {
+    "key": "schema",
+    "title": "[P0] Add migrations and synthetic seed data for library records",
+    "depends_on_keys": [
+      "scope",
+      "supabase"
+    ],
+    "body": "## Goal\nReplace the sample-only domain model with a reproducible database structure.\n\n## Scope\nTranslate the agreed library fields into migrations for departments, library entries, resource metadata, user access, and the minimal revision/audit information the agreed scope needs. Preserve the scaffold's repository boundary so UI components do not depend on database details.\n\n## Acceptance criteria\n- [ ] Add committed migrations with explicit keys, relationships, constraints, and indexes for the agreed browse/search queries.\n- [ ] Distinguish uploaded-file resources from linked resources and reject records that have an invalid combination of resource fields.\n- [ ] Define how current and archived content is represented, consistent with the discovery decision.\n- [ ] Add synthetic seeds for at least two departments and representative SOP/policy entries.\n- [ ] Verify migrations and seeds run from an empty development database.\n- [ ] Document the schema and any unresolved decisions. No real client files or employee data belong in seeds.\n\n## Priority\nP0 — data foundation.",
+    "issue_number": 4,
+    "url": "https://github.com/ChangePlusPlusVandy/secondharvest/issues/4"
+  },
+  {
+    "key": "auth",
+    "title": "[P0] Add staff sign-in, sign-out, and session handling",
+    "depends_on_keys": [
+      "scope",
+      "supabase",
+      "bootstrap"
+    ],
+    "body": "## Goal\nRequire authenticated staff access before the app handles real internal documents.\n\n## Scope\nImplement the identity provider and account-provisioning method agreed during discovery. Microsoft sign-in is an option to confirm with the client, not an assumption that tenant access is already available.\n\n## Acceptance criteria\n- [ ] Implement sign-in and sign-out with an approved account-provisioning flow.\n- [ ] Restrict membership to approved staff accounts; an arbitrary successful sign-in must not grant library access.\n- [ ] Establish and validate sessions on the server for protected routes and operations.\n- [ ] Handle expired sessions and failed sign-in attempts with a usable recovery path.\n- [ ] Verify unauthenticated requests cannot read real library records or file-download endpoints.\n- [ ] Document local testing accounts and provider configuration without recording credentials.\n\n## Priority\nP0 — prerequisite for private client data.",
+    "issue_number": 5,
+    "url": "https://github.com/ChangePlusPlusVandy/secondharvest/issues/5"
+  },
+  {
+    "key": "permissions",
+    "title": "[P0] Enforce library permissions in database and storage policies",
+    "depends_on_keys": [
+      "scope",
+      "schema",
+      "auth"
+    ],
+    "body": "## Goal\nEnforce the agreed read/edit/admin permissions when requests bypass the UI.\n\n## Scope\nUse the confirmed client roles and department visibility rules. UI visibility is a convenience; database and storage authorization must independently protect the data.\n\n## Acceptance criteria\n- [ ] Add version-controlled authorization policies for library records, revisions, and department access.\n- [ ] Ensure a normal user cannot assign themselves a more privileged role or change another user's access.\n- [ ] Protect uploaded objects and prevent a public bucket or guessed object path from bypassing staff permissions.\n- [ ] Make server-side operations check membership and authorization before performing privileged work.\n- [ ] Add meaningful integration coverage for an authorized reader, an editor/admin, an unauthorized user, and an unauthenticated request.\n- [ ] Document the permission matrix and how authorized administrators provision or revoke access.\n\n## Priority\nP0 — required before uploading client documents.",
+    "issue_number": 6,
+    "url": "https://github.com/ChangePlusPlusVandy/secondharvest/issues/6"
+  },
+  {
+    "key": "files",
+    "title": "[P1] Implement private document upload, viewing, and download",
+    "depends_on_keys": [
+      "schema",
+      "auth",
+      "permissions"
+    ],
+    "body": "## Goal\nLet authorized staff attach SOP/policy files and let permitted readers retrieve them.\n\n## Scope\nImplement the first agreed file formats and maximum size. In-browser preview is only required for formats supported by the chosen viewer; provide a download fallback.\n\n## Acceptance criteria\n- [ ] Validate allowed file type and size on the server, use unique storage keys, and preserve a display filename separately.\n- [ ] Store uploads in private storage and connect each successful upload to its library metadata.\n- [ ] Make upload failures recoverable without publishing a broken library entry; clean up or track orphaned objects.\n- [ ] Authorize view/download requests and use controlled access such as short-lived signed URLs.\n- [ ] Show an understandable error for missing files or denied access.\n- [ ] Verify authorized upload/download, unauthorized attempts, invalid files, and partial failure handling.\n\n## Priority\nP1 — core library functionality.",
+    "issue_number": 7,
+    "url": "https://github.com/ChangePlusPlusVandy/secondharvest/issues/7"
+  },
+  {
+    "key": "metadata",
+    "title": "[P1] Build library entry forms and linked-resource support",
+    "depends_on_keys": [
+      "schema",
+      "auth",
+      "permissions",
+      "files"
+    ],
+    "body": "## Goal\nAllow approved editors to maintain useful metadata and related resources.\n\n## Scope\nBuild create/edit forms for the fields agreed in discovery, such as title, summary, department, document type, and tags. Support both uploaded files and external resources if both are in the agreed MVP.\n\n## Acceptance criteria\n- [ ] Create and edit an entry using validated server-side operations and the existing repository boundary.\n- [ ] Provide required-field validation and preserve user input when a submission fails.\n- [ ] Associate a file through the upload flow or save a validated external resource URL; permit only approved URL schemes such as HTTPS.\n- [ ] Clearly identify external resources to readers. Do not imply the app controls access on an external site.\n- [ ] Confirm readers cannot modify entries through either the UI or direct requests.\n- [ ] Record the editor and update time for successful changes.\n- [ ] Verify create/edit and invalid-input paths with representative synthetic entries.\n\n## Priority\nP1 — content administration.",
+    "issue_number": 8,
+    "url": "https://github.com/ChangePlusPlusVandy/secondharvest/issues/8"
+  },
+  {
+    "key": "versions",
+    "title": "[P1] Implement agreed current-version and archive behavior",
+    "depends_on_keys": [
+      "scope",
+      "schema",
+      "permissions",
+      "metadata"
+    ],
+    "body": "## Goal\nMake it clear which procedure is current and prevent accidental loss of prior content.\n\n## Scope\nImplement the version/archive decisions made in discovery. Start with the smallest agreed workflow; do not add multistage approvals unless the client explicitly requests them for this milestone.\n\n## Acceptance criteria\n- [ ] Replace a document through the agreed revision flow without silently overwriting the prior file.\n- [ ] Enforce one current revision per entry, including concurrent update handling.\n- [ ] Display the current version/effective information selected in discovery and retain the agreed history.\n- [ ] Allow authorized staff to archive an entry and remove it from the ordinary current-document search.\n- [ ] Record who changed the current version or archived an entry and when.\n- [ ] Verify permission failures, duplicate-current prevention, and retrieval of any retained history according to the agreed access rules.\n\n## Priority\nP1 — document lifecycle; final details depend on discovery.",
+    "issue_number": 9,
+    "url": "https://github.com/ChangePlusPlusVandy/secondharvest/issues/9"
+  },
+  {
+    "key": "browse",
+    "title": "[P1] Connect library browsing, department filters, search, and detail pages",
+    "depends_on_keys": [
+      "schema",
+      "auth",
+      "permissions",
+      "metadata",
+      "versions"
+    ],
+    "body": "## Goal\nHelp staff quickly find the current procedure they need.\n\n## Scope\nReplace the scaffold's example-data repository with real authorized data. Keep the sample-data mode for development only. Implement the search coverage agreed in discovery and clearly document what is searchable.\n\n## Acceptance criteria\n- [ ] Browse current library entries and filter by department or functional area.\n- [ ] Search the agreed fields and combine search with filters predictably.\n- [ ] Open an entry's details and its authorized file or linked resource.\n- [ ] Handle loading, empty results, permission failures, and backend errors.\n- [ ] Add bounded queries/pagination so the UI does not need to load every document.\n- [ ] Preserve usable labels, keyboard interaction, readable mobile layouts, and a clear reset-filters action.\n- [ ] Verify archived or unauthorized entries do not leak through search, counts, or detail routes.\n\n## Priority\nP1 — main reader workflow.",
+    "issue_number": 10,
+    "url": "https://github.com/ChangePlusPlusVandy/secondharvest/issues/10"
+  },
+  {
+    "key": "pilot",
+    "title": "[P1] Run SOP-library workflow testing and a controlled staff pilot",
+    "depends_on_keys": [
+      "files",
+      "metadata",
+      "versions",
+      "browse"
+    ],
+    "body": "## Goal\nShow that the library supports the agreed real workflow before expanding its use.\n\n## Scope\nTest this module with approved pilot users and representative content. Keep the first pilot limited to the departments and acceptance scenarios agreed in discovery.\n\n## Acceptance criteria\n- [ ] Add end-to-end coverage for sign-in, authorized create/update, search/filter, viewing/downloading, and archiving.\n- [ ] Include negative access cases and verify private files cannot be retrieved by unauthorized users.\n- [ ] Check keyboard access and the primary workflow on a small mobile screen.\n- [ ] Have pilot users complete the agreed tasks and record results, issues, and prioritized feedback.\n- [ ] Fix release-blocking defects and obtain the client's acceptance of the scoped result or document remaining gaps.\n- [ ] Record feedback without committing confidential files, employee details, or production credentials.\n\n## Priority\nP1 — release acceptance.",
+    "issue_number": 11,
+    "url": "https://github.com/ChangePlusPlusVandy/secondharvest/issues/11"
+  },
+  {
+    "key": "handoff",
+    "title": "[P1] Deploy the approved library pilot and prepare operating documentation",
+    "depends_on_keys": [
+      "supabase",
+      "auth",
+      "permissions",
+      "files",
+      "metadata",
+      "versions",
+      "browse"
+    ],
+    "body": "## Goal\nMake the library available in an approved environment and transferable to the food bank's maintainers.\n\n## Scope\nDeployment and handoff cover the library only. Production release follows the pilot/acceptance decision; preparing deployment can happen before the pilot ticket is complete.\n\n## Acceptance criteria\n- [ ] Confirm client-approved hosting, ownership, costs, domain, and production credentials before provisioning paid services.\n- [ ] Configure deployment and environment variables with separate development/production data and correct authentication redirects.\n- [ ] Apply migrations and verify a deployed sign-in, authorized search, and file retrieval smoke check.\n- [ ] Document deployment, rollback/recovery, dependencies, environment-variable names, backup/restore responsibilities, and known issues.\n- [ ] Write concise reader/editor/admin instructions and a procedure for granting/revoking access.\n- [ ] Ensure the client or its nominated maintainer has the agreed source-code, administrator, and deployment access.\n- [ ] Confirm pilot acceptance before broader production use; record the maintenance owner and any limitations after student handoff.\n\n## Priority\nP1 — deployment and transition.",
+    "issue_number": 12,
+    "url": "https://github.com/ChangePlusPlusVandy/secondharvest/issues/12"
+  }
+]
